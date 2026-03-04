@@ -4,6 +4,8 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
@@ -22,6 +24,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'date_of_birth',
+        'weight',
+        'height',
     ];
 
     /**
@@ -44,6 +49,18 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'date_of_birth' => 'date',
+            'weight' => 'decimal:1',
         ];
+    }
+
+    public function allergens(): BelongsToMany
+    {
+        return $this->belongsToMany(Pollen::class);
+    }
+
+    public function symptomReports(): HasMany
+    {
+        return $this->hasMany(SymptomReport::class);
     }
 }
