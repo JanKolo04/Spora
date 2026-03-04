@@ -1,0 +1,13 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - sqlite-data:/app/database
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+
+volumes:
+  sqlite-data:
