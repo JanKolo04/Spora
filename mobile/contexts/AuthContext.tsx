@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { authApi, User } from '../services/api';
+import { authApi, RegisterData, User } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, passwordConfirmation: string) => Promise<void>;
+  register: (data: RegisterData) => Promise<void>;
+  refreshUser: () => Promise<void>;
   logout: () => Promise<void>;
 }
 
@@ -25,7 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = await SecureStore.getItemAsync('token');
       if (token) {
         const response = await authApi.getUser();
-        setUser(response.data);
+        setUser(response.data.data);
       }
     } catch {
       await SecureStore.deleteItemAsync('token');
@@ -40,10 +41,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(response.data.user);
   };
 
-  const register = async (name: string, email: string, password: string, passwordConfirmation: string) => {
-    const response = await authApi.register(name, email, password, passwordConfirmation);
+  const register = async (data: RegisterData) => {
+    const response = await authApi.register(data);
     await SecureStore.setItemAsync('token', response.data.token);
     setUser(response.data.user);
+  };
+
+  const refreshUser = async () => {
+    const response = await authApi.getUser();
+    setUser(response.data.data);
   };
 
   const logout = async () => {
@@ -57,7 +63,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, refreshUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

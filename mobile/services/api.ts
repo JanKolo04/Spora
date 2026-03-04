@@ -23,6 +23,47 @@ export interface User {
   id: number;
   name: string;
   email: string;
+  date_of_birth: string | null;
+  weight: number | null;
+  height: number | null;
+  allergen_ids: number[];
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  date_of_birth?: string;
+  weight?: number;
+  height?: number;
+  allergen_ids?: number[];
+}
+
+export interface ProfileUpdateData {
+  name?: string;
+  date_of_birth?: string | null;
+  weight?: number | null;
+  height?: number | null;
+}
+
+export interface SymptomReport {
+  id: number;
+  report_date: string;
+  severity: string;
+  symptoms: string[];
+  notes: string | null;
+  created_at: string;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: {
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+  };
 }
 
 export interface PollenReading {
@@ -46,15 +87,15 @@ export interface PollenDetail extends Pollen {
 }
 
 export const authApi = {
-  register: (name: string, email: string, password: string, password_confirmation: string) =>
-    api.post<{ user: User; token: string }>('/register', { name, email, password, password_confirmation }),
+  register: (data: RegisterData) =>
+    api.post<{ user: User; token: string }>('/register', data),
 
   login: (email: string, password: string) =>
     api.post<{ user: User; token: string }>('/login', { email, password }),
 
   logout: () => api.post('/logout'),
 
-  getUser: () => api.get<User>('/user'),
+  getUser: () => api.get<{ data: User }>('/user'),
 };
 
 export const pollenApi = {
@@ -63,6 +104,25 @@ export const pollenApi = {
 
   getById: (id: number) =>
     api.get<{ data: PollenDetail }>(`/pollens/${id}`),
+};
+
+export const profileApi = {
+  update: (data: ProfileUpdateData) =>
+    api.put<{ data: User }>('/profile', data),
+
+  updateAllergens: (allergen_ids: number[]) =>
+    api.put<{ data: User }>('/profile/allergens', { allergen_ids }),
+};
+
+export const symptomReportApi = {
+  getAll: (page: number = 1) =>
+    api.get<PaginatedResponse<SymptomReport>>('/symptom-reports', { params: { page } }),
+
+  create: (data: { report_date: string; severity: string; symptoms: string[]; notes?: string }) =>
+    api.post<{ data: SymptomReport }>('/symptom-reports', data),
+
+  delete: (id: number) =>
+    api.delete(`/symptom-reports/${id}`),
 };
 
 export default api;
