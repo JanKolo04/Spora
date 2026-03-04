@@ -20,6 +20,14 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="reports"
+        options={{
+          title: 'Raporty',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📋</Text>,
+          headerTitle: 'Raporty objawów',
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profil',
