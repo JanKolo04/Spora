@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserProfileResource;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -16,18 +17,31 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
+            'date_of_birth' => 'nullable|date',
+            'weight' => 'nullable|numeric|min:0|max:999',
+            'height' => 'nullable|integer|min:0|max:300',
+            'allergen_ids' => 'nullable|array',
+            'allergen_ids.*' => 'exists:pollens,id',
         ]);
 
         $user = User::create([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
+            'date_of_birth' => $validated['date_of_birth'] ?? null,
+            'weight' => $validated['weight'] ?? null,
+            'height' => $validated['height'] ?? null,
         ]);
 
+        if (! empty($validated['allergen_ids'])) {
+            $user->allergens()->sync($validated['allergen_ids']);
+        }
+
         $token = $user->createToken('mobile')->plainTextToken;
+        $user->load('allergens');
 
         return response()->json([
-            'user' => $user,
+            'user' => new UserProfileResource($user),
             'token' => $token,
         ], 201);
     }
@@ -48,9 +62,10 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('mobile')->plainTextToken;
+        $user->load('allergens');
 
         return response()->json([
-            'user' => $user,
+            'user' => new UserProfileResource($user),
             'token' => $token,
         ]);
     }
@@ -64,6 +79,8 @@ class AuthController extends Controller
 
     public function user(Request $request)
     {
-        return response()->json($request->user());
+        $request->user()->load('allergens');
+
+        return new UserProfileResource($request->user());
     }
 }
