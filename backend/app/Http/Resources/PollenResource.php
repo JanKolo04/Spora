@@ -17,6 +17,10 @@ class PollenResource extends JsonResource
             'latest_reading' => $this->whenLoaded('latestReading', function () {
                 return $this->latestReading ? [
                     'concentration' => $this->latestReading->concentration,
+                    'quantity' => $this->latestReading->quantity,
+                    'multiplier' => $this->latestReading->multiplier,
+                    'result' => $this->latestReading->result,
+                    'pollen_percentage' => $this->latestReading->pollen_percentage,
                     'level' => $this->latestReading->level,
                     'region' => $this->latestReading->region,
                     'reading_date' => $this->latestReading->reading_date->toDateString(),

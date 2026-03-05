@@ -18,6 +18,10 @@ class PollenDetailResource extends JsonResource
                 return [
                     'id' => $reading->id,
                     'concentration' => $reading->concentration,
+                    'quantity' => $reading->quantity,
+                    'multiplier' => $reading->multiplier,
+                    'result' => $reading->result,
+                    'pollen_percentage' => $reading->pollen_percentage,
                     'level' => $reading->level,
                     'region' => $reading->region,
                     'reading_date' => $reading->reading_date->toDateString(),

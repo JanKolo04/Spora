@@ -12,13 +12,17 @@
     @endif
 
     <div class="card">
-        <div class="card-body">
+        <div class="card-body table-responsive">
             <table class="table">
                 <thead>
                     <tr>
                         <th>Pyłek</th>
                         <th>Region</th>
                         <th>Stężenie</th>
+                        <th>Ilość</th>
+                        <th>Przelicznik</th>
+                        <th>Wynik</th>
+                        <th>% pylenia</th>
                         <th>Poziom</th>
                         <th>Data</th>
                         <th>Akcje</th>
@@ -30,6 +34,10 @@
                             <td>{{ $reading->pollen->icon }} {{ $reading->pollen->name }}</td>
                             <td>{{ $reading->region }}</td>
                             <td>{{ $reading->concentration }} ziaren/m³</td>
+                            <td>{{ $reading->quantity ?? '-' }}</td>
+                            <td>{{ $reading->multiplier ?? '-' }}</td>
+                            <td>{{ $reading->result ?? '-' }}</td>
+                            <td>{{ $reading->pollen_percentage !== null ? $reading->pollen_percentage . '%' : '-' }}</td>
                             <td>
                                 @php
                                     $badgeClass = match($reading->level) {
@@ -53,7 +61,7 @@
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="text-muted">Brak odczytów.</td></tr>
+                        <tr><td colspan="10" class="text-muted">Brak odczytów.</td></tr>
                     @endforelse
                 </tbody>
             </table>

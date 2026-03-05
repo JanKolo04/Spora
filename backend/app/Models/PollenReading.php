@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PollenReading extends Model
 {
-    protected $fillable = ['pollen_id', 'concentration', 'level', 'region', 'reading_date'];
+    protected $fillable = ['pollen_id', 'concentration', 'quantity', 'multiplier', 'result', 'pollen_percentage', 'level', 'region', 'reading_date'];
 
     protected function casts(): array
     {

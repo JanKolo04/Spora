@@ -29,10 +29,17 @@ class PollenReadingController extends Controller
         $validated = $request->validate([
             'pollen_id' => 'required|exists:pollens,id',
             'concentration' => 'required|integer|min:0',
+            'quantity' => 'nullable|numeric|min:0',
+            'multiplier' => 'nullable|numeric|min:0',
+            'pollen_percentage' => 'nullable|numeric|min:0|max:100',
             'level' => 'required|in:niski,średni,wysoki,bardzo wysoki',
             'region' => 'required|string|max:255',
             'reading_date' => 'required|date',
         ]);
+
+        if (isset($validated['quantity']) && isset($validated['multiplier'])) {
+            $validated['result'] = round($validated['quantity'] * $validated['multiplier'], 2);
+        }
 
         PollenReading::create($validated);
 
@@ -50,10 +57,19 @@ class PollenReadingController extends Controller
         $validated = $request->validate([
             'pollen_id' => 'required|exists:pollens,id',
             'concentration' => 'required|integer|min:0',
+            'quantity' => 'nullable|numeric|min:0',
+            'multiplier' => 'nullable|numeric|min:0',
+            'pollen_percentage' => 'nullable|numeric|min:0|max:100',
             'level' => 'required|in:niski,średni,wysoki,bardzo wysoki',
             'region' => 'required|string|max:255',
             'reading_date' => 'required|date',
         ]);
+
+        if (isset($validated['quantity']) && isset($validated['multiplier'])) {
+            $validated['result'] = round($validated['quantity'] * $validated['multiplier'], 2);
+        } else {
+            $validated['result'] = null;
+        }
 
         $reading->update($validated);
 

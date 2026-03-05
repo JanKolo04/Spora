@@ -30,6 +30,27 @@
                     <input type="number" class="form-control @error('concentration') is-invalid @enderror" id="concentration" name="concentration" value="{{ old('concentration', $reading->concentration) }}" min="0" required>
                     @error('concentration') <div class="invalid-feedback">{{ $message }}</div> @enderror
                 </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="quantity" class="form-label">Ilość</label>
+                        <input type="number" step="0.01" class="form-control @error('quantity') is-invalid @enderror" id="quantity" name="quantity" value="{{ old('quantity', $reading->quantity) }}" min="0">
+                        @error('quantity') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="multiplier" class="form-label">Przelicznik</label>
+                        <input type="number" step="0.0001" class="form-control @error('multiplier') is-invalid @enderror" id="multiplier" name="multiplier" value="{{ old('multiplier', $reading->multiplier) }}" min="0">
+                        @error('multiplier') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="result_display" class="form-label">Wynik (auto)</label>
+                        <input type="text" class="form-control" id="result_display" value="{{ $reading->result }}" readonly disabled>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="pollen_percentage" class="form-label">Procent pylenia (%)</label>
+                    <input type="number" step="0.01" class="form-control @error('pollen_percentage') is-invalid @enderror" id="pollen_percentage" name="pollen_percentage" value="{{ old('pollen_percentage', $reading->pollen_percentage) }}" min="0" max="100">
+                    @error('pollen_percentage') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                </div>
                 <div class="mb-3">
                     <label for="level" class="form-label">Poziom</label>
                     <select class="form-select @error('level') is-invalid @enderror" id="level" name="level" required>
@@ -50,4 +71,19 @@
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const qty = document.getElementById('quantity');
+        const mul = document.getElementById('multiplier');
+        const res = document.getElementById('result_display');
+        function calc() {
+            const q = parseFloat(qty.value);
+            const m = parseFloat(mul.value);
+            res.value = (!isNaN(q) && !isNaN(m)) ? (q * m).toFixed(2) : '';
+        }
+        qty.addEventListener('input', calc);
+        mul.addEventListener('input', calc);
+    });
+</script>
 @endsection
