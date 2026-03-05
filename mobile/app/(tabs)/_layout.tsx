@@ -20,6 +20,22 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="wellness"
+        options={{
+          title: 'Samopoczucie',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>📅</Text>,
+          headerTitle: 'Kalendarz samopoczucia',
+        }}
+      />
+      <Tabs.Screen
+        name="medications"
+        options={{
+          title: 'Leki',
+          tabBarIcon: ({ color }) => <Text style={{ fontSize: 20 }}>💊</Text>,
+          headerTitle: 'Przypomnienia o lekach',
+        }}
+      />
+      <Tabs.Screen
         name="reports"
         options={{
           title: 'Raporty',

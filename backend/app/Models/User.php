@@ -63,4 +63,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(SymptomReport::class);
     }
+
+    public function medicationReminders(): HasMany
+    {
+        return $this->hasMany(MedicationReminder::class);
+    }
+
+    public function wellnessEntries(): HasMany
+    {
+        return $this->hasMany(WellnessEntry::class);
+    }
 }

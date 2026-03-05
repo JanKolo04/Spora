@@ -66,9 +66,32 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export interface MedicationReminder {
+  id: number;
+  medication_name: string;
+  dosage: string | null;
+  remind_at: string;
+  days_of_week: number[];
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface WellnessEntry {
+  id: number;
+  entry_date: string;
+  rating: number;
+  symptoms: string[] | null;
+  notes: string | null;
+  created_at: string;
+}
+
 export interface PollenReading {
   id?: number;
   concentration: number;
+  quantity: number | null;
+  multiplier: number | null;
+  result: number | null;
+  pollen_percentage: number | null;
   level: string;
   region: string;
   reading_date: string;
@@ -123,6 +146,31 @@ export const symptomReportApi = {
 
   delete: (id: number) =>
     api.delete(`/symptom-reports/${id}`),
+};
+
+export const medicationApi = {
+  getAll: () =>
+    api.get<{ data: MedicationReminder[] }>('/medication-reminders'),
+
+  create: (data: { medication_name: string; dosage?: string; remind_at: string; days_of_week: number[] }) =>
+    api.post<{ data: MedicationReminder }>('/medication-reminders', data),
+
+  update: (id: number, data: Partial<{ medication_name: string; dosage: string; remind_at: string; days_of_week: number[]; is_active: boolean }>) =>
+    api.put<{ data: MedicationReminder }>(`/medication-reminders/${id}`, data),
+
+  delete: (id: number) =>
+    api.delete(`/medication-reminders/${id}`),
+};
+
+export const wellnessApi = {
+  getAll: (page: number = 1) =>
+    api.get<PaginatedResponse<WellnessEntry>>('/wellness-entries', { params: { page } }),
+
+  create: (data: { entry_date: string; rating: number; symptoms?: string[]; notes?: string }) =>
+    api.post<{ data: WellnessEntry }>('/wellness-entries', data),
+
+  delete: (id: number) =>
+    api.delete(`/wellness-entries/${id}`),
 };
 
 export default api;
