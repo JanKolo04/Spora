@@ -40,7 +40,7 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="wellness"
         options={{
-          title: 'Samopoczucie',
+          title: 'Zdrowie',
           headerTitle: 'Kalendarz samopoczucia',
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon name={focused ? 'calendar' : 'calendar-outline'} color={color} size={size} />
