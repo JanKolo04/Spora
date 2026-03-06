@@ -28,9 +28,12 @@ class PollenController extends Controller
         return PollenResource::collection($pollens);
     }
 
-    public function show(Pollen $pollen)
+    public function show(Request $request, Pollen $pollen)
     {
-        $pollen->load(['readings' => function ($q) {
+        $pollen->load(['readings' => function ($q) use ($request) {
+            if ($request->has('region')) {
+                $q->where('region', $request->input('region'));
+            }
             $q->orderByDesc('reading_date')->limit(30);
         }]);
 

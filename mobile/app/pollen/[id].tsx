@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { pollenApi, PollenDetail, PollenReading } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
 
 const levelColors: Record<string, string> = {
   'niski': '#4CAF50',
@@ -18,13 +19,14 @@ const levelColors: Record<string, string> = {
 
 export default function PollenDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useAuth();
   const [pollen, setPollen] = useState<PollenDetail | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchPollen = async () => {
       try {
-        const response = await pollenApi.getById(Number(id));
+        const response = await pollenApi.getById(Number(id), user?.region || undefined);
         setPollen(response.data.data);
       } catch (error) {
         console.error('Error fetching pollen details:', error);

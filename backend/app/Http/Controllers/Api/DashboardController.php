@@ -5,33 +5,46 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Pollen;
 use App\Models\PollenReading;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $pollensCount = Pollen::count();
-        $readingsCount = PollenReading::count();
-        $todayReadingsCount = PollenReading::whereDate('reading_date', today())->count();
+        $region = $request->input('region');
 
-        $levelDistribution = PollenReading::selectRaw('level, count(*) as count')
+        $readingsQuery = fn () => $region ? PollenReading::where('region', $region) : PollenReading::query();
+
+        $pollensCount = Pollen::count();
+        $readingsCount = $readingsQuery()->count();
+        $todayReadingsCount = $readingsQuery()->whereDate('reading_date', today())->count();
+
+        $levelDistribution = $readingsQuery()->selectRaw('level, count(*) as count')
             ->groupBy('level')
             ->pluck('count', 'level')
             ->toArray();
 
-        $last7Days = collect(range(6, 0))->map(function ($daysAgo) {
+        $last7Days = collect(range(6, 0))->map(function ($daysAgo) use ($readingsQuery) {
             $date = Carbon::today()->subDays($daysAgo);
+            $query = $readingsQuery()->whereDate('reading_date', $date);
             return [
                 'date' => $date->format('d.m'),
-                'count' => PollenReading::whereDate('reading_date', $date)->count(),
-                'avg_concentration' => (int) PollenReading::whereDate('reading_date', $date)->avg('concentration'),
+                'count' => (clone $query)->count(),
+                'avg_concentration' => (int) (clone $query)->avg('concentration'),
             ];
         })->values();
 
-        $topPollens = Pollen::withCount('readings')
-            ->with('latestReading')
-            ->has('readings')
+        $topPollensQuery = Pollen::with('latestReading');
+        if ($region) {
+            $topPollensQuery->withCount(['readings' => fn ($q) => $q->where('region', $region)])
+                ->with(['latestReading' => fn ($q) => $q->where('region', $region)])
+                ->whereHas('readings', fn ($q) => $q->where('region', $region));
+        } else {
+            $topPollensQuery->withCount('readings')->has('readings');
+        }
+
+        $topPollens = $topPollensQuery
             ->orderByDesc('readings_count')
             ->limit(5)
             ->get()
@@ -44,12 +57,17 @@ class DashboardController extends Controller
                 'latest_concentration' => $p->latestReading?->concentration,
             ]);
 
-        $highAlerts = PollenReading::with('pollen')
+        $highAlertsQuery = PollenReading::with('pollen')
             ->whereIn('level', ['wysoki', 'bardzo wysoki'])
             ->whereDate('reading_date', '>=', today()->subDays(3))
             ->orderByDesc('concentration')
-            ->limit(5)
-            ->get()
+            ->limit(5);
+
+        if ($region) {
+            $highAlertsQuery->where('region', $region);
+        }
+
+        $highAlerts = $highAlertsQuery->get()
             ->map(fn ($r) => [
                 'pollen_name' => $r->pollen->name,
                 'pollen_icon' => $r->pollen->icon,

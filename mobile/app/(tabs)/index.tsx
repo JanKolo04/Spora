@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { dashboardApi, pollenApi, Pollen, DashboardData } from '../../services/api';
+import { useAuth } from '../../contexts/AuthContext';
+import { REGION_NAMES } from '../../components/PolandMap';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const GREEN = '#4CAF50';
@@ -59,17 +61,20 @@ function MiniBarChart({ data }: { data: DashboardData['last_7_days'] }) {
 }
 
 export default function HomeScreen() {
+  const { user } = useAuth();
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [pollens, setPollens] = useState<Pollen[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [loading, setLoading] = useState(true);
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
+  const region = user?.region || undefined;
+
   const fetchData = useCallback(async () => {
     try {
       const [dashRes, pollenRes] = await Promise.all([
-        dashboardApi.get(),
-        pollenApi.getAll(),
+        dashboardApi.get(region),
+        pollenApi.getAll(region),
       ]);
       setDashboard(dashRes.data.data);
       setPollens(pollenRes.data.data);
@@ -79,7 +84,7 @@ export default function HomeScreen() {
       setLoading(false);
       setRefreshing(false);
     }
-  }, []);
+  }, [region]);
 
   useEffect(() => {
     fetchData();
@@ -120,6 +125,8 @@ export default function HomeScreen() {
         <View style={s.hero}>
           <Text style={s.heroTitle}>Witaj w Spora</Text>
           <Text style={s.heroSub}>
+            {region ? REGION_NAMES[region] || region : 'Cala Polska'}
+            {' · '}
             {highCount > 0
               ? `${highCount} ${highCount === 1 ? 'pylek' : 'pylkow'} z wysokim stezeniem`
               : 'Wszystkie stezenia w normie'}

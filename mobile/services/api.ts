@@ -47,6 +47,7 @@ export interface ProfileUpdateData {
   date_of_birth?: string | null;
   weight?: number | null;
   height?: number | null;
+  region?: string | null;
 }
 
 export interface SymptomReport {
@@ -134,15 +135,16 @@ export interface DashboardData {
 }
 
 export const dashboardApi = {
-  get: () => api.get<{ data: DashboardData }>('/dashboard'),
+  get: (region?: string) =>
+    api.get<{ data: DashboardData }>('/dashboard', { params: region ? { region } : {} }),
 };
 
 export const pollenApi = {
   getAll: (region?: string) =>
     api.get<{ data: Pollen[] }>('/pollens', { params: region ? { region } : {} }),
 
-  getById: (id: number) =>
-    api.get<{ data: PollenDetail }>(`/pollens/${id}`),
+  getById: (id: number, region?: string) =>
+    api.get<{ data: PollenDetail }>(`/pollens/${id}`, { params: region ? { region } : {} }),
 };
 
 export const profileApi = {

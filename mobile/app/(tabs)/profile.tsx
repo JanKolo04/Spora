@@ -12,6 +12,7 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { pollenApi, profileApi, Pollen } from '../../services/api';
+import PolandMap, { REGION_NAMES } from '../../components/PolandMap';
 
 export default function ProfileScreen() {
   const { user, refreshUser, logout } = useAuth();
@@ -20,6 +21,7 @@ export default function ProfileScreen() {
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
+  const [region, setRegion] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [pollens, setPollens] = useState<Pollen[]>([]);
@@ -33,6 +35,7 @@ export default function ProfileScreen() {
       setDateOfBirth(user.date_of_birth || '');
       setWeight(user.weight != null ? String(user.weight) : '');
       setHeight(user.height != null ? String(user.height) : '');
+      setRegion(user.region || null);
       setSelectedAllergens(user.allergen_ids || []);
     }
   }, [user]);
@@ -66,6 +69,7 @@ export default function ProfileScreen() {
         date_of_birth: dateOfBirth || null,
         weight: weight ? parseFloat(weight) : null,
         height: height ? parseInt(height, 10) : null,
+        region: region,
       });
       await refreshUser();
       Alert.alert('Sukces', 'Profil został zaktualizowany.');
@@ -145,6 +149,26 @@ export default function ProfileScreen() {
           disabled={saving}
         >
           <Text style={styles.saveButtonText}>{saving ? 'Zapisywanie...' : 'Zapisz'}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Region</Text>
+        <Text style={styles.regionHint}>
+          Dane pyłkowe będą filtrowane dla wybranego województwa
+        </Text>
+        <PolandMap selected={region} onSelect={setRegion} />
+        {region && (
+          <TouchableOpacity onPress={() => setRegion(null)}>
+            <Text style={styles.clearRegion}>Wyczyść wybór (pokaż całą Polskę)</Text>
+          </TouchableOpacity>
+        )}
+        <TouchableOpacity
+          style={[styles.saveButton, saving && styles.buttonDisabled]}
+          onPress={handleSaveProfile}
+          disabled={saving}
+        >
+          <Text style={styles.saveButtonText}>{saving ? 'Zapisywanie...' : 'Zapisz region'}</Text>
         </TouchableOpacity>
       </View>
 
@@ -276,6 +300,18 @@ const styles = StyleSheet.create({
   },
   chipTextSelected: {
     color: '#fff',
+  },
+  regionHint: {
+    fontSize: 13,
+    color: '#888',
+    marginBottom: 12,
+  },
+  clearRegion: {
+    color: '#F44336',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: 8,
+    marginBottom: 4,
   },
   logoutButton: {
     backgroundColor: '#F44336',
