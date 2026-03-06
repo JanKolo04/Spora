@@ -121,6 +121,20 @@ export const authApi = {
   getUser: () => api.get<{ data: User }>('/user'),
 };
 
+export interface DashboardData {
+  pollens_count: number;
+  readings_count: number;
+  today_readings_count: number;
+  level_distribution: Record<string, number>;
+  last_7_days: { date: string; count: number; avg_concentration: number }[];
+  top_pollens: { id: number; name: string; icon: string; readings_count: number; latest_level: string | null; latest_concentration: number | null }[];
+  high_alerts: { pollen_name: string; pollen_icon: string; concentration: number; level: string; region: string; reading_date: string }[];
+}
+
+export const dashboardApi = {
+  get: () => api.get<{ data: DashboardData }>('/dashboard'),
+};
+
 export const pollenApi = {
   getAll: (region?: string) =>
     api.get<{ data: Pollen[] }>('/pollens', { params: region ? { region } : {} }),

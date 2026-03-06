@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\MedicationReminderController;
 use App\Http\Controllers\Api\PollenController;
 use App\Http\Controllers\Api\SymptomReportController;
@@ -14,6 +15,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
+    Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/pollens', [PollenController::class, 'index']);
     Route::get('/pollens/{pollen}', [PollenController::class, 'show']);
 
