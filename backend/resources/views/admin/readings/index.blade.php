@@ -3,7 +3,10 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>Odczyty stężeń</h2>
+        <div class="d-flex align-items-center gap-3">
+            <a href="{{ route('admin.dashboard') }}" class="btn btn-outline-secondary">← Wróć</a>
+            <h2 class="mb-0">Odczyty stężeń</h2>
+        </div>
         <a href="{{ route('admin.readings.create') }}" class="btn btn-success">Dodaj odczyt</a>
     </div>
 
