@@ -32,7 +32,7 @@
                     <ul class="navbar-nav me-auto">
                         @auth
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ route('admin.dashboard') }}">Dashboard</a>
+                                <a class="nav-link" href="{{ route('admin.dashboard') }}">Strona glowna</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ route('admin.pollens.index') }}">Pyłki</a>
