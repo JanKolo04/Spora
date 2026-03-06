@@ -38,17 +38,6 @@ export default function TabsLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Pylki',
-          headerTitle: 'Spora',
-          tabBarIcon: ({ color, size, focused }) => (
-            <TabIcon name={focused ? 'leaf' : 'leaf-outline'} color={color} size={size} isHome />
-          ),
-          tabBarLabelStyle: styles.homeLabel,
-        }}
-      />
-      <Tabs.Screen
         name="wellness"
         options={{
           title: 'Samopoczucie',
@@ -66,6 +55,17 @@ export default function TabsLayout() {
           tabBarIcon: ({ color, size, focused }) => (
             <TabIcon name={focused ? 'medkit' : 'medkit-outline'} color={color} size={size} />
           ),
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Pylki',
+          headerTitle: 'Spora',
+          tabBarIcon: ({ color, size, focused }) => (
+            <TabIcon name={focused ? 'leaf' : 'leaf-outline'} color={color} size={size} isHome />
+          ),
+          tabBarLabelStyle: styles.homeLabel,
         }}
       />
       <Tabs.Screen
