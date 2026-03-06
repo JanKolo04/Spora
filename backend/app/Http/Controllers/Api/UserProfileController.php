@@ -15,6 +15,7 @@ class UserProfileController extends Controller
             'date_of_birth' => 'nullable|date',
             'weight' => 'nullable|numeric|min:0|max:999',
             'height' => 'nullable|integer|min:0|max:300',
+            'region' => 'nullable|string|max:255',
         ]);
 
         $request->user()->update($validated);

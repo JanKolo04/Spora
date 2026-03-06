@@ -16,6 +16,7 @@ class UserProfileResource extends JsonResource
             'date_of_birth' => $this->date_of_birth?->format('Y-m-d'),
             'weight' => $this->weight,
             'height' => $this->height,
+            'region' => $this->region,
             'allergen_ids' => $this->whenLoaded('allergens', fn () => $this->allergens->pluck('id')),
         ];
     }

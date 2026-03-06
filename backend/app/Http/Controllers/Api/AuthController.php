@@ -21,6 +21,7 @@ class AuthController extends Controller
             'weight' => 'nullable|numeric|min:0|max:999',
             'height' => 'nullable|integer|min:0|max:300',
             'allergen_ids' => 'nullable|array',
+            'region' => 'nullable|string|max:255',
             'allergen_ids.*' => 'exists:pollens,id',
         ]);
 
@@ -31,6 +32,7 @@ class AuthController extends Controller
             'date_of_birth' => $validated['date_of_birth'] ?? null,
             'weight' => $validated['weight'] ?? null,
             'height' => $validated['height'] ?? null,
+            'region' => $validated['region'] ?? null,
         ]);
 
         if (! empty($validated['allergen_ids'])) {

@@ -14,8 +14,9 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { pollenApi, Pollen, RegisterData } from '../../services/api';
+import PolandMap from '../../components/PolandMap';
 
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 
 export default function RegisterScreen() {
   const { register } = useAuth();
@@ -27,6 +28,8 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
+  const [region, setRegion] = useState<string | null>(null);
+
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
@@ -36,7 +39,7 @@ export default function RegisterScreen() {
   const [pollensLoading, setPollensLoading] = useState(false);
 
   useEffect(() => {
-    if (step === 3) {
+    if (step === 4) {
       loadPollens();
     }
   }, [step]);
@@ -62,11 +65,11 @@ export default function RegisterScreen() {
   const handleNext = () => {
     if (step === 1) {
       if (!name || !email || !password || !passwordConfirmation) {
-        Alert.alert('Błąd', 'Wypełnij wszystkie pola.');
+        Alert.alert('Blad', 'Wypelnij wszystkie pola.');
         return;
       }
       if (password !== passwordConfirmation) {
-        Alert.alert('Błąd', 'Hasła nie są identyczne.');
+        Alert.alert('Blad', 'Hasla nie sa identyczne.');
         return;
       }
     }
@@ -82,6 +85,7 @@ export default function RegisterScreen() {
         password,
         password_confirmation: passwordConfirmation,
       };
+      if (region) data.region = region;
       if (dateOfBirth) data.date_of_birth = dateOfBirth;
       if (weight) data.weight = parseFloat(weight);
       if (height) data.height = parseInt(height, 10);
@@ -90,8 +94,8 @@ export default function RegisterScreen() {
       await register(data);
       router.replace('/(tabs)');
     } catch (error: any) {
-      const message = error.response?.data?.message || 'Błąd rejestracji.';
-      Alert.alert('Błąd', message);
+      const message = error.response?.data?.message || 'Blad rejestracji.';
+      Alert.alert('Blad', message);
     } finally {
       setLoading(false);
     }
@@ -99,7 +103,7 @@ export default function RegisterScreen() {
 
   const renderStepIndicator = () => (
     <View style={styles.stepIndicator}>
-      {[1, 2, 3].map((s) => (
+      {[1, 2, 3, 4].map((s) => (
         <View
           key={s}
           style={[styles.stepDot, s === step && styles.stepDotActive, s < step && styles.stepDotDone]}
@@ -110,8 +114,8 @@ export default function RegisterScreen() {
 
   const renderStep1 = () => (
     <>
-      <Text style={styles.subtitle}>Utwórz konto</Text>
-      <TextInput style={styles.input} placeholder="Imię" value={name} onChangeText={setName} />
+      <Text style={styles.subtitle}>Utworz konto</Text>
+      <TextInput style={styles.input} placeholder="Imie" value={name} onChangeText={setName} />
       <TextInput
         style={styles.input}
         placeholder="Email"
@@ -122,14 +126,14 @@ export default function RegisterScreen() {
       />
       <TextInput
         style={styles.input}
-        placeholder="Hasło"
+        placeholder="Haslo"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
       />
       <TextInput
         style={styles.input}
-        placeholder="Potwierdź hasło"
+        placeholder="Potwierdz haslo"
         value={passwordConfirmation}
         onChangeText={setPasswordConfirmation}
         secureTextEntry
@@ -138,12 +142,23 @@ export default function RegisterScreen() {
         <Text style={styles.buttonText}>Dalej</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.back()}>
-        <Text style={styles.link}>Masz już konto? Zaloguj się</Text>
+        <Text style={styles.link}>Masz juz konto? Zaloguj sie</Text>
       </TouchableOpacity>
     </>
   );
 
   const renderStep2 = () => (
+    <>
+      <Text style={styles.subtitle}>Wybierz swoj region</Text>
+      <Text style={styles.hint}>Kliknij na mapie swoje wojewodztwo</Text>
+      <PolandMap selected={region} onSelect={setRegion} />
+      <TouchableOpacity style={[styles.button, !region && styles.buttonMuted]} onPress={handleNext}>
+        <Text style={styles.buttonText}>{region ? 'Dalej' : 'Pomin'}</Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  const renderStep3 = () => (
     <>
       <Text style={styles.subtitle}>Profil zdrowotny (opcjonalne)</Text>
       <TextInput
@@ -170,12 +185,12 @@ export default function RegisterScreen() {
         <Text style={styles.buttonText}>Dalej</Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={handleNext}>
-        <Text style={styles.link}>Pomiń</Text>
+        <Text style={styles.link}>Pomin</Text>
       </TouchableOpacity>
     </>
   );
 
-  const renderStep3 = () => (
+  const renderStep4 = () => (
     <>
       <Text style={styles.subtitle}>Wybierz alergeny (opcjonalne)</Text>
       {pollensLoading ? (
@@ -201,11 +216,11 @@ export default function RegisterScreen() {
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Rejestracja...' : 'Zarejestruj się'}
+          {loading ? 'Rejestracja...' : 'Zarejestruj sie'}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={handleSubmit} disabled={loading}>
-        <Text style={styles.link}>Pomiń</Text>
+        <Text style={styles.link}>Pomin</Text>
       </TouchableOpacity>
     </>
   );
@@ -221,6 +236,7 @@ export default function RegisterScreen() {
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
+        {step === 4 && renderStep4()}
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -247,7 +263,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     color: '#666',
-    marginBottom: 32,
+    marginBottom: 16,
+  },
+  hint: {
+    fontSize: 13,
+    textAlign: 'center',
+    color: '#999',
+    marginBottom: 12,
   },
   stepIndicator: {
     flexDirection: 'row',
@@ -282,6 +304,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     marginTop: 8,
+  },
+  buttonMuted: {
+    backgroundColor: '#A5D6A7',
   },
   buttonDisabled: {
     opacity: 0.6,

@@ -27,6 +27,7 @@ export interface User {
   weight: number | null;
   height: number | null;
   allergen_ids: number[];
+  region: string | null;
 }
 
 export interface RegisterData {
@@ -34,6 +35,7 @@ export interface RegisterData {
   email: string;
   password: string;
   password_confirmation: string;
+  region?: string;
   date_of_birth?: string;
   weight?: number;
   height?: number;
