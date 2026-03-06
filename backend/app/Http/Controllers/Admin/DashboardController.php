@@ -23,7 +23,7 @@ class DashboardController extends Controller
 
         $topPollens = Pollen::withCount('readings')
             ->with('latestReading')
-            ->having('readings_count', '>', 0)
+            ->has('readings')
             ->orderByDesc('readings_count')
             ->limit(6)
             ->get();
