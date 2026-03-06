@@ -58,6 +58,7 @@ export default function PollenDetailScreen() {
           title: `${pollen.icon} ${pollen.name}`,
           headerStyle: { backgroundColor: '#4CAF50' },
           headerTintColor: '#fff',
+          headerBackTitle: '',
         }}
       />
       <ScrollView style={styles.container}>
