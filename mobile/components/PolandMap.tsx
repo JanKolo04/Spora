@@ -50,12 +50,6 @@ export default function PolandMap({ selected, onSelect }: PolandMapProps) {
           );
         })}
       </Svg>
-      {selected && (
-        <View style={s.selectedContainer}>
-          <Text style={s.selectedLabel}>Wybrany region:</Text>
-          <Text style={s.selectedValue}>{REGION_NAMES[selected] || selected}</Text>
-        </View>
-      )}
     </View>
   );
 }
