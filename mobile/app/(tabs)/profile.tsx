@@ -12,7 +12,7 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { pollenApi, profileApi, Pollen } from '../../services/api';
-import PolandMap, { REGION_NAMES } from '../../components/PolandMap';
+import { REGION_NAMES } from '../../components/PolandMap';
 
 export default function ProfileScreen() {
   const { user, refreshUser, logout } = useAuth();
@@ -162,10 +162,20 @@ export default function ProfileScreen() {
         ) : (
           <Text style={styles.regionHint}>Nie wybrano regionu — wyświetlane są dane z całej Polski</Text>
         )}
-        <Text style={styles.regionHint}>
-          Kliknij na mapę, aby zmienić region
-        </Text>
-        <PolandMap selected={region} onSelect={setRegion} />
+        <Text style={styles.regionHint}>Wybierz województwo z listy</Text>
+        <View style={styles.chipContainer}>
+          {Object.entries(REGION_NAMES).map(([key, label]) => (
+            <TouchableOpacity
+              key={key}
+              style={[styles.chip, region === key && styles.chipSelected]}
+              onPress={() => setRegion(key)}
+            >
+              <Text style={[styles.chipText, region === key && styles.chipTextSelected]}>
+                {label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
         {region && (
           <TouchableOpacity onPress={() => setRegion(null)}>
             <Text style={styles.clearRegion}>Wyczyść wybór (pokaż całą Polskę)</Text>
