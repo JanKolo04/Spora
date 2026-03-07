@@ -83,12 +83,16 @@ export default function ProfileScreen() {
   };
 
   const handleSaveRegion = async () => {
+    console.log('handleSaveRegion called, region:', region);
     setSavingRegion(true);
     try {
-      await profileApi.update({ region });
+      console.log('Sending PUT /profile with:', { region });
+      const response = await profileApi.update({ region });
+      console.log('Response:', JSON.stringify(response.data));
       await refreshUser();
       Alert.alert('Sukces', 'Region został zapisany.');
     } catch (error: any) {
+      console.log('Error saving region:', error.message, error.response?.status, JSON.stringify(error.response?.data));
       const message = error.response?.data?.message || 'Błąd zapisu regionu.';
       Alert.alert('Błąd', message);
     } finally {
