@@ -13,7 +13,8 @@
       "backgroundColor": "#4CAF50"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jano99.spora"
     },
     "android": {
       "adaptiveIcon": {
