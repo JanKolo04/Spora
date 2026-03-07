@@ -154,8 +154,16 @@ export default function ProfileScreen() {
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Region</Text>
+        {region ? (
+          <View style={styles.currentRegion}>
+            <Text style={styles.currentRegionLabel}>Wybrany region:</Text>
+            <Text style={styles.currentRegionValue}>{REGION_NAMES[region] || region}</Text>
+          </View>
+        ) : (
+          <Text style={styles.regionHint}>Nie wybrano regionu — wyświetlane są dane z całej Polski</Text>
+        )}
         <Text style={styles.regionHint}>
-          Dane pyłkowe będą filtrowane dla wybranego województwa
+          Kliknij na mapę, aby zmienić region
         </Text>
         <PolandMap selected={region} onSelect={setRegion} />
         {region && (
@@ -300,6 +308,24 @@ const styles = StyleSheet.create({
   },
   chipTextSelected: {
     color: '#fff',
+  },
+  currentRegion: {
+    backgroundColor: '#E8F5E9',
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  currentRegionLabel: {
+    fontSize: 14,
+    color: '#666',
+  },
+  currentRegionValue: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#2E7D32',
   },
   regionHint: {
     fontSize: 13,
