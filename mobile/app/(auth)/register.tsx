@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import { useAuth } from '../../contexts/AuthContext';
 import { pollenApi, Pollen, RegisterData } from '../../services/api';
 import PolandMap from '../../components/PolandMap';
@@ -30,7 +31,8 @@ export default function RegisterScreen() {
 
   const [region, setRegion] = useState<string | null>(null);
 
-  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState<Date | null>(null);
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [weight, setWeight] = useState('');
   const [height, setHeight] = useState('');
 
@@ -86,7 +88,7 @@ export default function RegisterScreen() {
         password_confirmation: passwordConfirmation,
       };
       if (region) data.region = region;
-      if (dateOfBirth) data.date_of_birth = dateOfBirth;
+      if (dateOfBirth) data.date_of_birth = dateOfBirth.toISOString().split('T')[0];
       if (weight) data.weight = parseFloat(weight);
       if (height) data.height = parseInt(height, 10);
       if (selectedAllergens.length > 0) data.allergen_ids = selectedAllergens;
@@ -158,15 +160,57 @@ export default function RegisterScreen() {
     </>
   );
 
+  const onDateChange = (_event: DateTimePickerEvent, selectedDate?: Date) => {
+    if (Platform.OS === 'android') {
+      setShowDatePicker(false);
+    }
+    if (selectedDate) {
+      setDateOfBirth(selectedDate);
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const y = date.getFullYear();
+    return `${d}.${m}.${y}`;
+  };
+
   const renderStep3 = () => (
     <>
       <Text style={styles.subtitle}>Profil zdrowotny (opcjonalne)</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Data urodzenia (RRRR-MM-DD)"
-        value={dateOfBirth}
-        onChangeText={setDateOfBirth}
-      />
+      <TouchableOpacity
+        style={styles.dateButton}
+        onPress={() => setShowDatePicker(true)}
+      >
+        <Text style={[styles.dateButtonText, !dateOfBirth && styles.dateButtonPlaceholder]}>
+          {dateOfBirth ? formatDate(dateOfBirth) : 'Data urodzenia'}
+        </Text>
+      </TouchableOpacity>
+      {showDatePicker && (
+        <View style={styles.datePickerContainer}>
+          <DateTimePicker
+            value={dateOfBirth || new Date(2000, 0, 1)}
+            mode="date"
+            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            onChange={onDateChange}
+            maximumDate={new Date()}
+            minimumDate={new Date(1920, 0, 1)}
+            locale="pl"
+          />
+          {Platform.OS === 'ios' && (
+            <TouchableOpacity
+              style={styles.dateConfirmButton}
+              onPress={() => {
+                if (!dateOfBirth) setDateOfBirth(new Date(2000, 0, 1));
+                setShowDatePicker(false);
+              }}
+            >
+              <Text style={styles.dateConfirmText}>Gotowe</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      )}
       <TextInput
         style={styles.input}
         placeholder="Waga (kg)"
@@ -321,6 +365,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
     fontSize: 14,
+  },
+  dateButton: {
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    padding: 14,
+    marginBottom: 12,
+  },
+  dateButtonText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  dateButtonPlaceholder: {
+    color: '#999',
+  },
+  datePickerContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginBottom: 12,
+    overflow: 'hidden',
+  },
+  dateConfirmButton: {
+    alignItems: 'center',
+    padding: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  dateConfirmText: {
+    color: '#4CAF50',
+    fontSize: 16,
+    fontWeight: '600',
   },
   chipContainer: {
     flexDirection: 'row',
