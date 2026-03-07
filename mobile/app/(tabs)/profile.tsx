@@ -12,7 +12,7 @@ import {
 import { router } from 'expo-router';
 import { useAuth } from '../../contexts/AuthContext';
 import { pollenApi, profileApi, Pollen } from '../../services/api';
-import { REGION_NAMES } from '../../components/PolandMap';
+import PolandMap, { REGION_NAMES } from '../../components/PolandMap';
 
 export default function ProfileScreen() {
   const { user, refreshUser, logout } = useAuth();
@@ -23,6 +23,7 @@ export default function ProfileScreen() {
   const [height, setHeight] = useState('');
   const [region, setRegion] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [savingRegion, setSavingRegion] = useState(false);
 
   const [pollens, setPollens] = useState<Pollen[]>([]);
   const [selectedAllergens, setSelectedAllergens] = useState<number[]>([]);
@@ -78,6 +79,20 @@ export default function ProfileScreen() {
       Alert.alert('Błąd', message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleSaveRegion = async () => {
+    setSavingRegion(true);
+    try {
+      await profileApi.update({ region });
+      await refreshUser();
+      Alert.alert('Sukces', 'Region został zapisany.');
+    } catch (error: any) {
+      const message = error.response?.data?.message || 'Błąd zapisu regionu.';
+      Alert.alert('Błąd', message);
+    } finally {
+      setSavingRegion(false);
     }
   };
 
@@ -162,31 +177,18 @@ export default function ProfileScreen() {
         ) : (
           <Text style={styles.regionHint}>Nie wybrano regionu — wyświetlane są dane z całej Polski</Text>
         )}
-        <Text style={styles.regionHint}>Wybierz województwo z listy</Text>
-        <View style={styles.chipContainer}>
-          {Object.entries(REGION_NAMES).map(([key, label]) => (
-            <TouchableOpacity
-              key={key}
-              style={[styles.chip, region === key && styles.chipSelected]}
-              onPress={() => setRegion(key)}
-            >
-              <Text style={[styles.chipText, region === key && styles.chipTextSelected]}>
-                {label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
+        <PolandMap selected={region} onSelect={setRegion} />
         {region && (
           <TouchableOpacity onPress={() => setRegion(null)}>
             <Text style={styles.clearRegion}>Wyczyść wybór (pokaż całą Polskę)</Text>
           </TouchableOpacity>
         )}
         <TouchableOpacity
-          style={[styles.saveButton, saving && styles.buttonDisabled]}
-          onPress={handleSaveProfile}
-          disabled={saving}
+          style={[styles.saveButton, savingRegion && styles.buttonDisabled]}
+          onPress={handleSaveRegion}
+          disabled={savingRegion}
         >
-          <Text style={styles.saveButtonText}>{saving ? 'Zapisywanie...' : 'Zapisz region'}</Text>
+          <Text style={styles.saveButtonText}>{savingRegion ? 'Zapisywanie...' : 'Zapisz region'}</Text>
         </TouchableOpacity>
       </View>
 
